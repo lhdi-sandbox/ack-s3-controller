@@ -97,12 +97,15 @@ func (rm *resourceManager) ReadOne(
 	ctx context.Context,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, error) {
+	rlog := ackrtlog.FromContext(ctx)
+	rlog.Debug("In ReadOne")
 	r := rm.concreteResource(res)
 	if r.ko == nil {
 		// Should never happen... if it does, it's buggy code.
 		panic("resource manager's ReadOne() method received resource with nil CR object")
 	}
 	observed, err := rm.sdkFind(ctx, r)
+
 	if err != nil {
 		if observed != nil {
 			return rm.onError(observed, err)
@@ -119,6 +122,8 @@ func (rm *resourceManager) Create(
 	ctx context.Context,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, error) {
+	rlog := ackrtlog.FromContext(ctx)
+	rlog.Trace("In Create")
 	r := rm.concreteResource(res)
 	if r.ko == nil {
 		// Should never happen... if it does, it's buggy code.
@@ -148,6 +153,8 @@ func (rm *resourceManager) Update(
 	resLatest acktypes.AWSResource,
 	delta *ackcompare.Delta,
 ) (acktypes.AWSResource, error) {
+	rlog := ackrtlog.FromContext(ctx)
+	rlog.Debug("In update")
 	desired := rm.concreteResource(resDesired)
 	latest := rm.concreteResource(resLatest)
 	if desired.ko == nil || latest.ko == nil {
@@ -172,6 +179,8 @@ func (rm *resourceManager) Delete(
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, error) {
 	r := rm.concreteResource(res)
+	rlog := ackrtlog.FromContext(ctx)
+	rlog.Debug("In Delete")
 	if r.ko == nil {
 		// Should never happen... if it does, it's buggy code.
 		panic("resource manager's Update() method received resource with nil CR object")
@@ -210,6 +219,7 @@ func (rm *resourceManager) LateInitialize(
 	latest acktypes.AWSResource,
 ) (acktypes.AWSResource, error) {
 	rlog := ackrtlog.FromContext(ctx)
+	rlog.Debug("In late initilaize")
 	// If there are no fields to late initialize, do nothing
 	if len(lateInitializeFieldNames) == 0 {
 		rlog.Debug("no late initialization required.")

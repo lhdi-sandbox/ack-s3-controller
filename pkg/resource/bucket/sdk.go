@@ -67,15 +67,18 @@ func (rm *resourceManager) sdkFind(
 	if rm.requiredFieldsMissingFromReadManyInput(r) {
 		return nil, ackerr.NotFound
 	}
-
+	rlog.Trace("Hi right before rmListRequestPayload")
 	input, err := rm.newListRequestPayload(r)
 	if err != nil {
 		return nil, err
 	}
 	var resp *svcsdk.ListBucketsOutput
 	resp, err = rm.sdkapi.ListBucketsWithContext(ctx, input)
+	fmt.Println(resp.GoString())
+	rlog.Trace("Hi right after getting response")
 	rm.metrics.RecordAPICall("READ_MANY", "ListBuckets", err)
 	if err != nil {
+		rlog.Trace("In if error l81 sdk.go")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchBucket" {
 			return nil, ackerr.NotFound
 		}
@@ -85,7 +88,6 @@ func (rm *resourceManager) sdkFind(
 	// Merge in the information we read from the API call above to the copy of
 	// the original Kubernetes object we passed to the function
 	ko := r.ko.DeepCopy()
-
 	found := false
 	for _, elem := range resp.Buckets {
 		if elem.Name != nil {
@@ -97,8 +99,10 @@ func (rm *resourceManager) sdkFind(
 			ko.Spec.Name = elem.Name
 		} else {
 			ko.Spec.Name = nil
+			rlog.Trace("Didnt find bucket")
 		}
 		found = true
+		rlog.Trace("Found bucket")
 		break
 	}
 	if !found {
@@ -108,6 +112,7 @@ func (rm *resourceManager) sdkFind(
 	rm.setStatusDefaults(ko)
 	if err := rm.addPutFieldsToSpec(ctx, r, ko); err != nil {
 		return nil, err
+		rlog.Trace("Hit error")
 	}
 	return &resource{ko}, nil
 }
@@ -127,6 +132,7 @@ func (rm *resourceManager) newListRequestPayload(
 	r *resource,
 ) (*svcsdk.ListBucketsInput, error) {
 	res := &svcsdk.ListBucketsInput{}
+	fmt.Println(res.GoString())
 
 	return res, nil
 }
@@ -144,6 +150,8 @@ func (rm *resourceManager) sdkCreate(
 		exit(err)
 	}()
 	input, err := rm.newCreateRequestPayload(ctx, desired)
+	rlog.Trace("Printing out input")
+	fmt.Println(input.GoString())
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +159,8 @@ func (rm *resourceManager) sdkCreate(
 	var resp *svcsdk.CreateBucketOutput
 	_ = resp
 	resp, err = rm.sdkapi.CreateBucketWithContext(ctx, input)
+	rlog.Trace("Printing out response")
+	fmt.Println(resp.GoString())
 	rm.metrics.RecordAPICall("CREATE", "CreateBucket", err)
 	if err != nil {
 		return nil, err
@@ -179,7 +189,9 @@ func (rm *resourceManager) newCreateRequestPayload(
 	r *resource,
 ) (*svcsdk.CreateBucketInput, error) {
 	res := &svcsdk.CreateBucketInput{}
-
+	rlog := ackrtlog.FromContext(ctx)
+	rlog.Trace("New request payload")
+	fmt.Println(res.GoString())
 	if r.ko.Spec.ACL != nil {
 		res.SetACL(*r.ko.Spec.ACL)
 	}
@@ -223,6 +235,8 @@ func (rm *resourceManager) sdkUpdate(
 	latest *resource,
 	delta *ackcompare.Delta,
 ) (*resource, error) {
+	rlog := ackrtlog.FromContext(ctx)
+	rlog.Trace("In sdkUpdate")
 	return rm.customUpdateBucket(ctx, desired, latest, delta)
 }
 
