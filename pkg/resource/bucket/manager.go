@@ -123,7 +123,7 @@ func (rm *resourceManager) Create(
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, error) {
 	rlog := ackrtlog.FromContext(ctx)
-	rlog.Trace("In Create")
+	rlog.Debug("In Create")
 	r := rm.concreteResource(res)
 	if r.ko == nil {
 		// Should never happen... if it does, it's buggy code.
