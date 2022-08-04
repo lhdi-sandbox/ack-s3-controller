@@ -294,11 +294,13 @@ func (rm *resourceManager) addPutFieldsToSpec(
 	r *resource,
 	ko *svcapitypes.Bucket,
 ) (err error) {
+	rlog := ackrtlog.FromContext(ctx)
 	getAccelerateResponse, err := rm.sdkapi.GetBucketAccelerateConfigurationWithContext(ctx, rm.newGetBucketAcceleratePayload(r))
 	if err != nil {
 		// This method is not supported in every region, ignore any errors if
 		// we attempt to describe this property in a region in which it's not
 		// supported.
+		rlog.Debug("GetBucketAccelerateConfigurationWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "MethodNotAllowed" {
 			getAccelerateResponse = &svcsdk.GetBucketAccelerateConfigurationOutput{}
 		} else {
@@ -309,6 +311,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	listAnalyticsResponse, err := rm.sdkapi.ListBucketAnalyticsConfigurationsWithContext(ctx, rm.newListBucketAnalyticsPayload(r))
 	if err != nil {
+		rlog.Debug("ListBucketAnalyticsConfigurationsWithContext Failed")
 		return err
 	}
 	ko.Spec.Analytics = make([]*svcapitypes.AnalyticsConfiguration, len(listAnalyticsResponse.AnalyticsConfigurationList))
@@ -318,12 +321,14 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getACLResponse, err := rm.sdkapi.GetBucketAclWithContext(ctx, rm.newGetBucketACLPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketAclWithContext Failed")
 		return err
 	}
 	rm.setResourceACL(ko, getACLResponse)
 
 	getCORSResponse, err := rm.sdkapi.GetBucketCorsWithContext(ctx, rm.newGetBucketCORSPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketCorsWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchCORSConfiguration" {
 			getCORSResponse = &svcsdk.GetBucketCorsOutput{}
 		} else {
@@ -334,6 +339,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getEncryptionResponse, err := rm.sdkapi.GetBucketEncryptionWithContext(ctx, rm.newGetBucketEncryptionPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketEncryptionWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "ServerSideEncryptionConfigurationNotFoundError" {
 			getEncryptionResponse = &svcsdk.GetBucketEncryptionOutput{
 				ServerSideEncryptionConfiguration: &svcsdk.ServerSideEncryptionConfiguration{},
@@ -346,6 +352,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	listIntelligentTieringResponse, err := rm.sdkapi.ListBucketIntelligentTieringConfigurationsWithContext(ctx, rm.newListBucketIntelligentTieringPayload(r))
 	if err != nil {
+		rlog.Debug("ListBucketIntelligentTieringConfigurationsWithContext Failed")
 		return err
 	}
 	ko.Spec.IntelligentTiering = make([]*svcapitypes.IntelligentTieringConfiguration, len(listIntelligentTieringResponse.IntelligentTieringConfigurationList))
@@ -355,6 +362,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	listInventoryResponse, err := rm.sdkapi.ListBucketInventoryConfigurationsWithContext(ctx, rm.newListBucketInventoryPayload(r))
 	if err != nil {
+		rlog.Debug("ListBucketInventoryConfigurationsWithContext Failed")
 		return err
 	}
 	ko.Spec.Inventory = make([]*svcapitypes.InventoryConfiguration, len(listInventoryResponse.InventoryConfigurationList))
@@ -364,6 +372,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getLifecycleResponse, err := rm.sdkapi.GetBucketLifecycleConfigurationWithContext(ctx, rm.newGetBucketLifecyclePayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketLifecycleConfigurationWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchLifecycleConfiguration" {
 			getLifecycleResponse = &svcsdk.GetBucketLifecycleConfigurationOutput{}
 		} else {
@@ -374,12 +383,14 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getLoggingResponse, err := rm.sdkapi.GetBucketLoggingWithContext(ctx, rm.newGetBucketLoggingPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketLoggingWithContext Failed")
 		return err
 	}
 	ko.Spec.Logging = rm.setResourceLogging(r, getLoggingResponse)
 
 	listMetricsResponse, err := rm.sdkapi.ListBucketMetricsConfigurationsWithContext(ctx, rm.newListBucketMetricsPayload(r))
 	if err != nil {
+		rlog.Debug("ListBucketMetricsConfigurationsWithContext Failed")
 		return err
 	}
 	ko.Spec.Metrics = make([]*svcapitypes.MetricsConfiguration, len(listMetricsResponse.MetricsConfigurationList))
@@ -389,12 +400,14 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getNotificationResponse, err := rm.sdkapi.GetBucketNotificationConfigurationWithContext(ctx, rm.newGetBucketNotificationPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketNotificationConfigurationWithContext Failed")
 		return err
 	}
 	ko.Spec.Notification = rm.setResourceNotification(r, getNotificationResponse)
 
 	getOwnershipControlsResponse, err := rm.sdkapi.GetBucketOwnershipControlsWithContext(ctx, rm.newGetBucketOwnershipControlsPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketOwnershipControlsWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "OwnershipControlsNotFoundError" {
 			getOwnershipControlsResponse = &svcsdk.GetBucketOwnershipControlsOutput{
 				OwnershipControls: &svcsdk.OwnershipControls{},
@@ -404,6 +417,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		}
 	}
 	if getOwnershipControlsResponse.OwnershipControls != nil {
+		rlog.Debug("getOwnershipControlsResponse.OwnershipControls != nil")
 		ko.Spec.OwnershipControls = rm.setResourceOwnershipControls(r, getOwnershipControlsResponse)
 	} else {
 		ko.Spec.OwnershipControls = nil
@@ -411,6 +425,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getPolicyResponse, err := rm.sdkapi.GetBucketPolicyWithContext(ctx, rm.newGetBucketPolicyPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketPolicyWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchBucketPolicy" {
 			getPolicyResponse = &svcsdk.GetBucketPolicyOutput{}
 		} else {
@@ -421,6 +436,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getPublicAccessBlockResponse, err := rm.sdkapi.GetPublicAccessBlockWithContext(ctx, rm.newGetPublicAccessBlockPayload(r))
 	if err != nil {
+		rlog.Debug("GetPublicAccessBlockWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchPublicAccessBlockConfiguration" {
 			getPublicAccessBlockResponse = &svcsdk.GetPublicAccessBlockOutput{}
 		} else {
@@ -428,6 +444,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		}
 	}
 	if getPublicAccessBlockResponse.PublicAccessBlockConfiguration != nil {
+		rlog.Debug("getPublicAccessBlockResponse.PublicAccessBlockConfiguration != nil")
 		ko.Spec.PublicAccessBlock = rm.setResourcePublicAccessBlock(r, getPublicAccessBlockResponse)
 	} else {
 		ko.Spec.PublicAccessBlock = nil
@@ -435,6 +452,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getReplicationResponse, err := rm.sdkapi.GetBucketReplicationWithContext(ctx, rm.newGetBucketReplicationPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketReplicationWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "ReplicationConfigurationNotFoundError" {
 			getReplicationResponse = &svcsdk.GetBucketReplicationOutput{}
 		} else {
@@ -442,6 +460,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		}
 	}
 	if getReplicationResponse.ReplicationConfiguration != nil {
+		rlog.Debug("getReplicationResponse.ReplicationConfiguration != nil")
 		ko.Spec.Replication = rm.setResourceReplication(r, getReplicationResponse)
 	} else {
 		ko.Spec.Replication = nil
@@ -449,12 +468,14 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getRequestPaymentResponse, err := rm.sdkapi.GetBucketRequestPaymentWithContext(ctx, rm.newGetBucketRequestPaymentPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketReplicationWithContext Failed")
 		return nil
 	}
 	ko.Spec.RequestPayment = rm.setResourceRequestPayment(r, getRequestPaymentResponse)
 
 	getTaggingResponse, err := rm.sdkapi.GetBucketTaggingWithContext(ctx, rm.newGetBucketTaggingPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketTaggingWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchTagSet" {
 			getTaggingResponse = &svcsdk.GetBucketTaggingOutput{}
 		} else {
@@ -465,12 +486,14 @@ func (rm *resourceManager) addPutFieldsToSpec(
 
 	getVersioningResponse, err := rm.sdkapi.GetBucketVersioningWithContext(ctx, rm.newGetBucketVersioningPayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketVersioningWithContext Failed")
 		return err
 	}
 	ko.Spec.Versioning = rm.setResourceVersioning(r, getVersioningResponse)
 
 	getWebsiteResponse, err := rm.sdkapi.GetBucketWebsiteWithContext(ctx, rm.newGetBucketWebsitePayload(r))
 	if err != nil {
+		rlog.Debug("GetBucketWebsiteWithContext Failed")
 		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchWebsiteConfiguration" {
 			getWebsiteResponse = &svcsdk.GetBucketWebsiteOutput{}
 		} else {
