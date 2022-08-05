@@ -307,6 +307,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketAccelerateConfigurationWithContext succeeded")
 	ko.Spec.Accelerate = rm.setResourceAccelerate(r, getAccelerateResponse)
 
 	listAnalyticsResponse, err := rm.sdkapi.ListBucketAnalyticsConfigurationsWithContext(ctx, rm.newListBucketAnalyticsPayload(r))
@@ -314,6 +315,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("ListBucketAnalyticsConfigurationsWithContext Failed")
 		return err
 	}
+	rlog.Debug("ListBucketAnalyticsConfigurationsWithContext succeeded")
 	ko.Spec.Analytics = make([]*svcapitypes.AnalyticsConfiguration, len(listAnalyticsResponse.AnalyticsConfigurationList))
 	for i, analyticsConfiguration := range listAnalyticsResponse.AnalyticsConfigurationList {
 		ko.Spec.Analytics[i] = rm.setResourceAnalyticsConfiguration(r, analyticsConfiguration)
@@ -324,6 +326,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("GetBucketAclWithContext Failed")
 		return err
 	}
+	rlog.Debug("GetBucketAclWithContext succeeded")
 	rm.setResourceACL(ko, getACLResponse)
 
 	getCORSResponse, err := rm.sdkapi.GetBucketCorsWithContext(ctx, rm.newGetBucketCORSPayload(r))
@@ -335,6 +338,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketCorsWithContext succeeded")
 	ko.Spec.CORS = rm.setResourceCORS(r, getCORSResponse)
 
 	getEncryptionResponse, err := rm.sdkapi.GetBucketEncryptionWithContext(ctx, rm.newGetBucketEncryptionPayload(r))
@@ -348,6 +352,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketEncryptionWithContext succeeded")
 	ko.Spec.Encryption = rm.setResourceEncryption(r, getEncryptionResponse)
 
 	listIntelligentTieringResponse, err := rm.sdkapi.ListBucketIntelligentTieringConfigurationsWithContext(ctx, rm.newListBucketIntelligentTieringPayload(r))
@@ -355,6 +360,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("ListBucketIntelligentTieringConfigurationsWithContext Failed")
 		return err
 	}
+	rlog.Debug("ListBucketIntelligentTieringConfigurationsWithContext succeeded")
 	ko.Spec.IntelligentTiering = make([]*svcapitypes.IntelligentTieringConfiguration, len(listIntelligentTieringResponse.IntelligentTieringConfigurationList))
 	for i, intelligentTieringConfiguration := range listIntelligentTieringResponse.IntelligentTieringConfigurationList {
 		ko.Spec.IntelligentTiering[i] = rm.setResourceIntelligentTieringConfiguration(r, intelligentTieringConfiguration)
@@ -365,6 +371,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("ListBucketInventoryConfigurationsWithContext Failed")
 		return err
 	}
+	rlog.Debug("ListBucketInventoryConfigurationsWithContext succeeded")
 	ko.Spec.Inventory = make([]*svcapitypes.InventoryConfiguration, len(listInventoryResponse.InventoryConfigurationList))
 	for i, inventoryConfiguration := range listInventoryResponse.InventoryConfigurationList {
 		ko.Spec.Inventory[i] = rm.setResourceInventoryConfiguration(r, inventoryConfiguration)
@@ -379,6 +386,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketLifecycleConfigurationWithContext succeeded")
 	ko.Spec.Lifecycle = rm.setResourceLifecycle(r, getLifecycleResponse)
 
 	getLoggingResponse, err := rm.sdkapi.GetBucketLoggingWithContext(ctx, rm.newGetBucketLoggingPayload(r))
@@ -386,6 +394,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("GetBucketLoggingWithContext Failed")
 		return err
 	}
+	rlog.Debug("GetBucketLoggingWithContext succeeded")
 	ko.Spec.Logging = rm.setResourceLogging(r, getLoggingResponse)
 
 	listMetricsResponse, err := rm.sdkapi.ListBucketMetricsConfigurationsWithContext(ctx, rm.newListBucketMetricsPayload(r))
@@ -393,6 +402,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("ListBucketMetricsConfigurationsWithContext Failed")
 		return err
 	}
+	rlog.Debug("ListBucketMetricsConfigurationsWithContext succeeded")
 	ko.Spec.Metrics = make([]*svcapitypes.MetricsConfiguration, len(listMetricsResponse.MetricsConfigurationList))
 	for i, metricsConfiguration := range listMetricsResponse.MetricsConfigurationList {
 		ko.Spec.Metrics[i] = rm.setResourceMetricsConfiguration(r, metricsConfiguration)
@@ -403,6 +413,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("GetBucketNotificationConfigurationWithContext Failed")
 		return err
 	}
+	rlog.Debug("GetBucketNotificationConfigurationWithContext succeeded")
 	ko.Spec.Notification = rm.setResourceNotification(r, getNotificationResponse)
 
 	getOwnershipControlsResponse, err := rm.sdkapi.GetBucketOwnershipControlsWithContext(ctx, rm.newGetBucketOwnershipControlsPayload(r))
@@ -416,10 +427,12 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketOwnershipControlsWithContext succeeded")
 	if getOwnershipControlsResponse.OwnershipControls != nil {
 		rlog.Debug("getOwnershipControlsResponse.OwnershipControls != nil")
 		ko.Spec.OwnershipControls = rm.setResourceOwnershipControls(r, getOwnershipControlsResponse)
 	} else {
+		rlog.Debug("getOwnershipControlsResponse.OwnershipControls == nil")
 		ko.Spec.OwnershipControls = nil
 	}
 
@@ -432,6 +445,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketPolicyWithContext succeeded")
 	ko.Spec.Policy = getPolicyResponse.Policy
 
 	getPublicAccessBlockResponse, err := rm.sdkapi.GetPublicAccessBlockWithContext(ctx, rm.newGetPublicAccessBlockPayload(r))
@@ -443,6 +457,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetPublicAccessBlockWithContext succeeded")
 	if getPublicAccessBlockResponse.PublicAccessBlockConfiguration != nil {
 		rlog.Debug("getPublicAccessBlockResponse.PublicAccessBlockConfiguration != nil")
 		ko.Spec.PublicAccessBlock = rm.setResourcePublicAccessBlock(r, getPublicAccessBlockResponse)
@@ -459,18 +474,21 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketReplicationWithContext succeeded")
 	if getReplicationResponse.ReplicationConfiguration != nil {
 		rlog.Debug("getReplicationResponse.ReplicationConfiguration != nil")
 		ko.Spec.Replication = rm.setResourceReplication(r, getReplicationResponse)
-	} else {
+		} else {
+		rlog.Debug("getReplicationResponse.ReplicationConfiguration == nil")
 		ko.Spec.Replication = nil
 	}
 
 	getRequestPaymentResponse, err := rm.sdkapi.GetBucketRequestPaymentWithContext(ctx, rm.newGetBucketRequestPaymentPayload(r))
 	if err != nil {
-		rlog.Debug("GetBucketReplicationWithContext Failed")
+		rlog.Debug("GetBucketRequestPaymentWithContext Failed")
 		return nil
 	}
+	rlog.Debug("GetBucketRequestPaymentWithContext succeeded")
 	ko.Spec.RequestPayment = rm.setResourceRequestPayment(r, getRequestPaymentResponse)
 
 	getTaggingResponse, err := rm.sdkapi.GetBucketTaggingWithContext(ctx, rm.newGetBucketTaggingPayload(r))
@@ -482,6 +500,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketTaggingWithContext succeeded")
 	ko.Spec.Tagging = rm.setResourceTagging(r, getTaggingResponse)
 
 	getVersioningResponse, err := rm.sdkapi.GetBucketVersioningWithContext(ctx, rm.newGetBucketVersioningPayload(r))
@@ -489,6 +508,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		rlog.Debug("GetBucketVersioningWithContext Failed")
 		return err
 	}
+	rlog.Debug("GetBucketVersioningWithContext succeeded")
 	ko.Spec.Versioning = rm.setResourceVersioning(r, getVersioningResponse)
 
 	getWebsiteResponse, err := rm.sdkapi.GetBucketWebsiteWithContext(ctx, rm.newGetBucketWebsitePayload(r))
@@ -500,6 +520,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 			return err
 		}
 	}
+	rlog.Debug("GetBucketWebsiteWithContext succeeded")
 	ko.Spec.Website = rm.setResourceWebsite(r, getWebsiteResponse)
 	return nil
 }
