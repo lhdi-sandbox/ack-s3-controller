@@ -301,12 +301,13 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		// This method is not supported in every region, ignore any errors if
 		// we attempt to describe this property in a region in which it's not
 		// supported.
+
 		rlog.Debug("GetBucketAccelerateConfigurationWithContext Failed")
 		awsErr, ok := ackerr.AWSError(err)
 		rlog.Debug(fmt.Sprintf("awsErr.Code() = %s", awsErr.Code()))
 		rlog.Debug(fmt.Sprintf("awsErr.Message() = %s", awsErr.Message()))
 		rlog.Debug(fmt.Sprintf("awsErr.Error() = %s", awsErr.Error()))
-		if ok && awsErr.Code() == "MethodNotAllowed" {
+		if ok && (awsErr.Code() == "MethodNotAllowed" || awsErr.Code() == "UnsupportedArgument") {
 			getAccelerateResponse = &svcsdk.GetBucketAccelerateConfigurationOutput{}
 		} else {
 			return err
@@ -483,7 +484,7 @@ func (rm *resourceManager) addPutFieldsToSpec(
 	if getReplicationResponse.ReplicationConfiguration != nil {
 		rlog.Debug("getReplicationResponse.ReplicationConfiguration != nil")
 		ko.Spec.Replication = rm.setResourceReplication(r, getReplicationResponse)
-		} else {
+	} else {
 		rlog.Debug("getReplicationResponse.ReplicationConfiguration == nil")
 		ko.Spec.Replication = nil
 	}
