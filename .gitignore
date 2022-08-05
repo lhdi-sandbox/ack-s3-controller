@@ -6,3 +6,4 @@
 bin
 build
 go.local.sum
+.vscode

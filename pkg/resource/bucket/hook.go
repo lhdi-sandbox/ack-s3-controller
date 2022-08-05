@@ -15,6 +15,7 @@ package bucket
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -301,7 +302,11 @@ func (rm *resourceManager) addPutFieldsToSpec(
 		// we attempt to describe this property in a region in which it's not
 		// supported.
 		rlog.Debug("GetBucketAccelerateConfigurationWithContext Failed")
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "MethodNotAllowed" {
+		awsErr, ok := ackerr.AWSError(err)
+		rlog.Debug(fmt.Sprintf("awsErr.Code() = %s", awsErr.Code()))
+		rlog.Debug(fmt.Sprintf("awsErr.Message() = %s", awsErr.Message()))
+		rlog.Debug(fmt.Sprintf("awsErr.Error() = %s", awsErr.Error()))
+		if ok && awsErr.Code() == "MethodNotAllowed" {
 			getAccelerateResponse = &svcsdk.GetBucketAccelerateConfigurationOutput{}
 		} else {
 			return err
