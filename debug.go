@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -16,8 +17,34 @@ func main() {
 	response, err := s3Client.ListBuckets(bucketQuery)
 
 	if err != nil {
-		log.Fatalf("error: %s", err.Error())
+		log.Fatalf("ListBuckets error: %s", err.Error())
 	}
 
+	fmt.Println("BUCKETS:")
 	fmt.Println(response.GoString())
+	fmt.Println("---------")
+
+	context := context.TODO()
+	for i := 0; i < len(response.Buckets); i++ {
+		fmt.Println(fmt.Sprintf("\nBucket: %s", *response.Buckets[i].Name))
+		input := &s3.GetBucketAccelerateConfigurationInput{
+			Bucket: response.Buckets[i].Name,
+		}
+
+		resp, err := s3Client.GetBucketAccelerateConfigurationWithContext(context, input)
+		if err != nil {
+			fmt.Println(fmt.Sprintf("GetBucketAccelerateConfigurationWithContext ERROR: %s", err.Error()))
+		} else {
+			fmt.Println("GetBucketAccelerateConfigurationWithContext RESULT", resp.GoString())
+		}
+
+		resp, err = s3Client.GetBucketAccelerateConfiguration(input)
+		if err != nil {
+			fmt.Println(fmt.Sprintf("GetBucketAccelerateConfiguration ERROR: %s", err.Error()))
+		} else {
+			fmt.Println("GetBucketAccelerateConfiguration RESULT", resp.GoString())
+		}
+
+		fmt.Println("\n---------")
+	}
 }
